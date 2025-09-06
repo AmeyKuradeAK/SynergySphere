@@ -1,4 +1,6 @@
-import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import DateTimePicker, {
+  DateTimePickerAndroid,
+} from '@react-native-community/datetimepicker';
 import * as React from 'react';
 import { View } from 'react-native';
 
@@ -36,7 +38,8 @@ export function DatePicker(
             variant="plain"
             androidRootClassName="rounded-none"
             onPress={show('date')}
-            className="border-foreground/30 rounded border px-2.5 py-3 active:opacity-80">
+            className="border-foreground/30 rounded border px-2.5 py-3 active:opacity-80"
+          >
             <Text className="py-px text-sm">
               {new Intl.DateTimeFormat('en-US', {
                 dateStyle: 'medium',
@@ -44,7 +47,11 @@ export function DatePicker(
             </Text>
           </Button>
           <View
-            className={cn('absolute left-2 top-0 bg-card px-1', props.materialDateLabelClassName)}>
+            className={cn(
+              'absolute left-2 top-0 bg-card px-1',
+              props.materialDateLabelClassName
+            )}
+          >
             <Text variant="caption2" className="text-[10px] opacity-60">
               {props.materialDateLabel ?? 'Date'}
             </Text>
@@ -57,7 +64,8 @@ export function DatePicker(
             variant="plain"
             androidRootClassName="rounded-none"
             onPress={show('time')}
-            className="border-foreground/30 rounded border px-2.5 py-3 active:opacity-80">
+            className="border-foreground/30 rounded border px-2.5 py-3 active:opacity-80"
+          >
             <Text className="py-px text-sm">
               {new Intl.DateTimeFormat('en-US', {
                 timeStyle: 'short',
@@ -65,7 +73,11 @@ export function DatePicker(
             </Text>
           </Button>
           <View
-            className={cn('absolute left-2 top-0 bg-card px-1', props.materialTimeLabelClassName)}>
+            className={cn(
+              'absolute left-2 top-0 bg-card px-1',
+              props.materialTimeLabelClassName
+            )}
+          >
             <Text variant="caption2" className="text-[10px] opacity-60">
               {props.materialTimeLabel ?? 'Time'}
             </Text>

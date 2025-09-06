@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
+import { AuthProvider } from '~/contexts/AuthProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -37,10 +38,16 @@ export default function RootLayout() {
         <BottomSheetModalProvider>
           <ActionSheetProvider>
             <NavThemeProvider value={NAV_THEME[colorScheme]}>
-              <Stack screenOptions={SCREEN_OPTIONS}>
-                <Stack.Screen name="(drawer)" options={DRAWER_OPTIONS} />
-                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-              </Stack>
+              <AuthProvider>
+                <Stack screenOptions={SCREEN_OPTIONS}>
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen name="(drawer)" options={DRAWER_OPTIONS} />
+                  <Stack.Screen name="modal" options={MODAL_OPTIONS} />
+                </Stack>
+              </AuthProvider>
             </NavThemeProvider>
           </ActionSheetProvider>
         </BottomSheetModalProvider>

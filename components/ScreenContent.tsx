@@ -10,7 +10,11 @@ type ScreenContentProps = {
   children?: React.ReactNode;
 };
 
-export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+export const ScreenContent = ({
+  title,
+  path,
+  children,
+}: ScreenContentProps) => {
   return (
     <View style={styles.container}>
       <Text variant="title1" className="text-center">

@@ -25,7 +25,14 @@ export function useHeaderSearchBar(props: SearchBarProps = {}) {
         ...props,
       } satisfies SearchBarProps,
     });
-  }, [navigation, colorScheme, colors.foreground, colors.primary, colors.grey, props]);
+  }, [
+    navigation,
+    colorScheme,
+    colors.foreground,
+    colors.primary,
+    colors.grey,
+    props,
+  ]);
 
   return search;
 }

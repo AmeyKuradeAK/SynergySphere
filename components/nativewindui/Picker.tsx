@@ -18,7 +18,8 @@ export function Picker<T>({
       className={cn(
         'ios:shadow-sm ios:shadow-black/5 rounded-md border border-background bg-background',
         className
-      )}>
+      )}
+    >
       <RNPicker
         mode={mode}
         style={

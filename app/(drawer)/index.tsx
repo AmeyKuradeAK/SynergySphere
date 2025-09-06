@@ -1,486 +1,220 @@
-import { Stack } from 'expo-router';
-import { useHeaderHeight } from '@react-navigation/elements';
-import { LegendList } from '@legendapp/list';
-import { cssInterop } from 'nativewind';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Button as RNButton,
-  ButtonProps,
-  Linking,
-  Platform,
-  Share,
-  useWindowDimensions,
   View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  RefreshControl,
   Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { useActionSheet } from '@expo/react-native-action-sheet';
-
-import { Icon } from '@roninoss/icons';
-
-import * as StoreReview from 'expo-store-review';
-
-import { Container } from '~/components/Container';
-
-import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
-
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/nativewindui/Avatar';
-
-import { DatePicker } from '~/components/nativewindui/DatePicker';
-
-import { Picker, PickerItem } from '~/components/nativewindui/Picker';
-
-import { ProgressIndicator } from '~/components/nativewindui/ProgressIndicator';
-
-import { Sheet, useSheetRef } from '~/components/nativewindui/Sheet';
-
-import { Slider } from '~/components/nativewindui/Slider';
-
-import { Text } from '~/components/nativewindui/Text';
-
-import { Toggle } from '~/components/nativewindui/Toggle';
-
-import { useColorScheme } from '~/lib/useColorScheme';
-import { useHeaderSearchBar } from '~/lib/useHeaderSearchBar';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '~/contexts/AuthProvider';
+import { useProjectsStore, useTasksStore } from '~/store/store';
+import { FirestoreService } from '~/services/firestore';
+import { Project, Task } from '~/types';
 
 export default function Home() {
-  const searchValue = useHeaderSearchBar({ hideWhenScrolling: COMPONENTS.length === 0 });
+  const { user } = useAuth();
+  const { projects, setProjects, setLoading } = useProjectsStore();
+  const { tasks, setTasks } = useTasksStore();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const data = searchValue
-    ? COMPONENTS.filter((c) => c.name.toLowerCase().includes(searchValue.toLowerCase()))
-    : COMPONENTS;
+  useEffect(() => {
+    if (user) {
+      loadProjects();
 
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Home' }} />
-      <Container>
-        <LegendList
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
-          data={data}
-          estimatedItemSize={200}
-          contentContainerClassName="py-4 android:pb-12"
-          extraData={searchValue}
-          keyExtractor={keyExtractor}
-          ItemSeparatorComponent={renderItemSeparator}
-          renderItem={renderItem}
-          ListEmptyComponent={COMPONENTS.length === 0 ? ListEmptyComponent : undefined}
-          recycleItems
-        />
-      </Container>
-    </>
-  );
-}
-
-cssInterop(LegendList, {
-  className: 'style',
-  contentContainerClassName: 'contentContainerStyle',
-});
-
-function DefaultButton({ color, ...props }: ButtonProps) {
-  const { colors } = useColorScheme();
-  return <RNButton color={color ?? colors.primary} {...props} />;
-}
-
-function ListEmptyComponent() {
-  const insets = useSafeAreaInsets();
-  const dimensions = useWindowDimensions();
-  const headerHeight = useHeaderHeight();
-  const { colors } = useColorScheme();
-  const height = dimensions.height - headerHeight - insets.bottom - insets.top;
-
-  return (
-    <View style={{ height }} className="flex-1 items-center justify-center gap-1 px-12">
-      <Icon name="file-plus-outline" size={42} color={colors.grey} />
-      <Text variant="title3" className="pb-1 text-center font-semibold">
-        No Components Installed
-      </Text>
-      <Text color="tertiary" variant="subhead" className="pb-4 text-center">
-        You can install any of the free components from the{' '}
-        <Text
-          onPress={() => Linking.openURL('https://nativewindui.com')}
-          variant="subhead"
-          className="text-primary">
-          NativeWindUI
-        </Text>
-        {' website.'}
-      </Text>
-    </View>
-  );
-}
-
-type ComponentItem = { name: string; component: React.FC };
-
-function keyExtractor(item: ComponentItem) {
-  return item.name;
-}
-
-function renderItemSeparator() {
-  return <View className="p-2" />;
-}
-
-function renderItem({ item }: { item: ComponentItem }) {
-  return (
-    <Card title={item.name}>
-      <item.component />
-    </Card>
-  );
-}
-
-function Card({ children, title }: { children: React.ReactNode; title: string }) {
-  return (
-    <View className="px-4">
-      <View className="gap-4 rounded-xl border border-border bg-card p-4 pb-6 shadow-sm shadow-black/10 dark:shadow-none">
-        <Text className="text-center text-sm font-medium tracking-wider opacity-60">{title}</Text>
-        {children}
-      </View>
-    </View>
-  );
-}
-
-let hasRequestedReview = false;
-
-const COMPONENTS: ComponentItem[] = [
-  {
-    name: 'Picker',
-    component: function PickerExample() {
-      const { colors } = useColorScheme();
-      const [picker, setPicker] = React.useState('blue');
-      return (
-        <Picker selectedValue={picker} onValueChange={(itemValue) => setPicker(itemValue)}>
-          <PickerItem
-            label="Red"
-            value="red"
-            color={colors.foreground}
-            style={{
-              backgroundColor: colors.root,
-            }}
-          />
-          <PickerItem
-            label="Blue"
-            value="blue"
-            color={colors.foreground}
-            style={{
-              backgroundColor: colors.root,
-            }}
-          />
-          <PickerItem
-            label="Green"
-            value="green"
-            color={colors.foreground}
-            style={{
-              backgroundColor: colors.root,
-            }}
-          />
-        </Picker>
-      );
-    },
-  },
-
-  {
-    name: 'Date Picker',
-    component: function DatePickerExample() {
-      const [date, setDate] = React.useState(new Date());
-      return (
-        <View className="items-center">
-          <DatePicker
-            value={date}
-            mode="datetime"
-            onChange={(ev) => {
-              setDate(new Date(ev.nativeEvent.timestamp));
-            }}
-          />
-        </View>
-      );
-    },
-  },
-
-  {
-    name: 'Slider',
-    component: function SliderExample() {
-      const [sliderValue, setSliderValue] = React.useState(0.5);
-      return <Slider value={sliderValue} onValueChange={setSliderValue} />;
-    },
-  },
-
-  {
-    name: 'Toggle',
-    component: function ToggleExample() {
-      const [switchValue, setSwitchValue] = React.useState(true);
-      return (
-        <View className="items-center">
-          <Toggle value={switchValue} onValueChange={setSwitchValue} />
-        </View>
-      );
-    },
-  },
-
-  {
-    name: 'Progress Indicator',
-    component: function ProgressIndicatorExample() {
-      const [progress, setProgress] = React.useState(13);
-      const id = React.useRef<ReturnType<typeof setInterval> | null>(null);
-      React.useEffect(() => {
-        if (!id.current) {
-          id.current = setInterval(() => {
-            setProgress((prev) => (prev >= 99 ? 0 : prev + 5));
-          }, 1000);
+      // Set up real-time listener for user projects
+      const unsubscribe = FirestoreService.listenToUserProjects(
+        user.uid,
+        (updatedProjects) => {
+          setProjects(updatedProjects);
         }
-        return () => {
-          if (id.current) clearInterval(id.current);
-        };
-      }, []);
-      return (
-        <View className="p-4">
-          <ProgressIndicator value={progress} />
-        </View>
       );
-    },
-  },
 
-  {
-    name: 'Activity Indicator',
-    component: function ActivityIndicatorExample() {
-      return (
-        <View className="items-center p-4">
-          <ActivityIndicator />
+      return unsubscribe;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, setProjects]); // loadProjects is defined inside the component, so it's safe to omit
+
+  const loadProjects = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const userProjects = await FirestoreService.getUserProjects(user.uid);
+      setProjects(userProjects);
+
+      // Load tasks for all projects
+      const allTasks: Task[] = [];
+      for (const project of userProjects) {
+        const projectTasks = await FirestoreService.getProjectTasks(project.id);
+        allTasks.push(...projectTasks);
+      }
+      setTasks(allTasks);
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      Alert.alert('Error', 'Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadProjects();
+    setRefreshing(false);
+  };
+
+  const getProjectStats = () => {
+    const totalProjects = projects.length;
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(
+      (task) => task.status === 'done'
+    ).length;
+    const inProgressTasks = tasks.filter(
+      (task) => task.status === 'in_progress'
+    ).length;
+    const todoTasks = tasks.filter((task) => task.status === 'todo').length;
+
+    return {
+      totalProjects,
+      totalTasks,
+      completedTasks,
+      inProgressTasks,
+      todoTasks,
+    };
+  };
+
+  const stats = getProjectStats();
+
+  const renderProjectCard = ({ item }: { item: Project }) => {
+    const projectTasks = tasks.filter((task) => task.projectId === item.id);
+    const completedTasks = projectTasks.filter(
+      (task) => task.status === 'done'
+    ).length;
+    const totalTasks = projectTasks.length;
+    const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+    return (
+      <TouchableOpacity
+        className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-100"
+        onPress={() => router.push(`/project/${item.id}`)}
+      >
+        <View className="flex-row justify-between items-start mb-3">
+          <Text className="text-lg font-semibold text-gray-900 flex-1 mr-2">
+            {item.name}
+          </Text>
+          <View className="flex-row items-center space-x-1">
+            <Ionicons name="people" size={16} color="#6b7280" />
+            <Text className="text-sm text-gray-600">{item.members.length}</Text>
+          </View>
         </View>
-      );
-    },
-  },
 
-  {
-    name: 'Action Sheet',
-    component: function ActionSheetExample() {
-      const { colorScheme, colors } = useColorScheme();
-      const { showActionSheetWithOptions } = useActionSheet();
-      return (
-        <View className="items-center">
-          <DefaultButton
-            color={'grey'}
-            onPress={async () => {
-              const options = ['Delete', 'Save', 'Cancel'];
-              const destructiveButtonIndex = 0;
-              const cancelButtonIndex = 2;
+        <Text className="text-sm text-gray-600 mb-3" numberOfLines={2}>
+          {item.description}
+        </Text>
 
-              showActionSheetWithOptions(
-                {
-                  options,
-                  cancelButtonIndex,
-                  destructiveButtonIndex,
-                  containerStyle: {
-                    backgroundColor: colorScheme === 'dark' ? 'black' : 'white',
-                  },
-                  textStyle: {
-                    color: colors.foreground,
-                  },
-                },
-                (selectedIndex) => {
-                  switch (selectedIndex) {
-                    case 1:
-                      // Save
-                      break;
+        <View className="flex-row justify-between items-center">
+          <Text className="text-sm text-gray-500">
+            {completedTasks}/{totalTasks} tasks completed
+          </Text>
+          <Text className="text-sm font-medium text-blue-600">
+            {Math.round(progress)}%
+          </Text>
+        </View>
 
-                    case destructiveButtonIndex:
-                      // Delete
-                      break;
-
-                    case cancelButtonIndex:
-                    // Canceled
-                  }
-                }
-              );
-            }}
-            title="Open action sheet"
+        <View className="mt-2 bg-gray-200 rounded-full h-2">
+          <View
+            className="bg-blue-600 h-2 rounded-full"
+            style={{ width: `${progress}%` }}
           />
         </View>
-      );
-    },
-  },
+      </TouchableOpacity>
+    );
+  };
 
-  {
-    name: 'Text',
-    component: function TextExample() {
-      return (
-        <View className="gap-2">
-          <Text variant="largeTitle" className="text-center">
-            Large Title
-          </Text>
-          <Text variant="title1" className="text-center">
-            Title 1
-          </Text>
-          <Text variant="title2" className="text-center">
-            Title 2
-          </Text>
-          <Text variant="title3" className="text-center">
-            Title 3
-          </Text>
-          <Text variant="heading" className="text-center">
-            Heading
-          </Text>
-          <Text variant="body" className="text-center">
-            Body
-          </Text>
-          <Text variant="callout" className="text-center">
-            Callout
-          </Text>
-          <Text variant="subhead" className="text-center">
-            Subhead
-          </Text>
-          <Text variant="footnote" className="text-center">
-            Footnote
-          </Text>
-          <Text variant="caption1" className="text-center">
-            Caption 1
-          </Text>
-          <Text variant="caption2" className="text-center">
-            Caption 2
-          </Text>
+  return (
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <View className="flex-1">
+        {/* Header */}
+        <View className="px-6 py-4 bg-white border-b border-gray-100">
+          <View className="flex-row justify-between items-center">
+            <View>
+              <Text className="text-2xl font-bold text-gray-900">Projects</Text>
+              <Text className="text-sm text-gray-600">
+                Welcome back, {user?.displayName || 'User'}!
+              </Text>
+            </View>
+            <TouchableOpacity
+              className="w-12 h-12 bg-blue-600 rounded-full items-center justify-center"
+              onPress={() => router.push('/modal')}
+            >
+              <Ionicons name="add" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
-      );
-    },
-  },
-  {
-    name: 'Selectable Text',
-    component: function SelectableTextExample() {
-      return (
-        <Text uiTextView selectable>
-          Long press or double press this text
-        </Text>
-      );
-    },
-  },
 
-  {
-    name: 'Ratings Indicator',
-    component: function RatingsIndicatorExample() {
-      React.useEffect(() => {
-        async function showRequestReview() {
-          if (hasRequestedReview) return;
-          try {
-            if (await StoreReview.hasAction()) {
-              await StoreReview.requestReview();
-            }
-          } catch (error) {
-            console.log(
-              'FOR ANDROID: Make sure you meet all conditions to be able to test and use it: https://developer.android.com/guide/playcore/in-app-review/test#troubleshooting',
-              error
-            );
-          } finally {
-            hasRequestedReview = true;
-          }
-        }
-        const timeout = setTimeout(() => {
-          showRequestReview();
-        }, 1000);
-
-        return () => clearTimeout(timeout);
-      }, []);
-
-      return (
-        <View className="gap-3">
-          <Text className="pb-2 text-center font-semibold">Please follow the guidelines.</Text>
-          <View className="flex-row">
-            <Text className="w-6 text-center text-muted-foreground">·</Text>
-            <View className="flex-1">
-              <Text variant="caption1" className="text-muted-foreground">
-                {'Do not call StoreReview.requestReview() from a button'}
+        {/* Stats Cards */}
+        <View className="px-6 py-4">
+          <View className="flex-row space-x-4">
+            <View className="flex-1 bg-blue-50 rounded-lg p-4">
+              <Text className="text-2xl font-bold text-blue-600">
+                {stats.totalProjects}
               </Text>
+              <Text className="text-sm text-blue-600">Active Projects</Text>
             </View>
-          </View>
-          <View className="flex-row">
-            <Text className="w-6 text-center text-muted-foreground">·</Text>
-            <View className="flex-1">
-              <Text variant="caption1" className="text-muted-foreground">
-                {'Do not request a review when the user is doing something time sensitive.'}
+            <View className="flex-1 bg-green-50 rounded-lg p-4">
+              <Text className="text-2xl font-bold text-green-600">
+                {stats.completedTasks}
               </Text>
+              <Text className="text-sm text-green-600">Completed Tasks</Text>
             </View>
-          </View>
-          <View className="flex-row">
-            <Text className="w-6 text-center text-muted-foreground">·</Text>
-            <View className="flex-1">
-              <Text variant="caption1" className="text-muted-foreground">
-                {
-                  'Do not ask the user any questions before or while presenting the rating button or card.'
-                }
+            <View className="flex-1 bg-orange-50 rounded-lg p-4">
+              <Text className="text-2xl font-bold text-orange-600">
+                {stats.inProgressTasks}
               </Text>
+              <Text className="text-sm text-orange-600">In Progress</Text>
             </View>
           </View>
         </View>
-      );
-    },
-  },
 
-  {
-    name: 'Activity View',
-    component: function ActivityViewExample() {
-      return (
-        <View className="items-center">
-          <DefaultButton
-            onPress={async () => {
-              try {
-                const result = await Share.share({
-                  message: 'NativeWindUI | Familiar interface, native feel.',
-                });
-                if (result.action === Share.sharedAction) {
-                  if (result.activityType) {
-                    // shared with activity type of result.activityType
-                  } else {
-                    // shared
-                  }
-                } else if (result.action === Share.dismissedAction) {
-                  // dismissed
-                }
-              } catch (error: any) {
-                Alert.alert(error.message);
+        {/* Projects List */}
+        <View className="flex-1 px-6">
+          <Text className="text-lg font-semibold text-gray-900 mb-4">
+            My Projects
+          </Text>
+
+          {projects.length === 0 ? (
+            <View className="flex-1 justify-center items-center">
+              <Ionicons name="folder-open-outline" size={64} color="#d1d5db" />
+              <Text className="text-lg font-medium text-gray-500 mt-4">
+                No projects yet
+              </Text>
+              <Text className="text-sm text-gray-400 text-center mt-2">
+                Create your first project to get started
+              </Text>
+              <TouchableOpacity
+                className="bg-blue-600 px-6 py-3 rounded-lg mt-4"
+                onPress={() => router.push('/modal')}
+              >
+                <Text className="text-white font-medium">Create Project</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={projects}
+              renderItem={renderProjectCard}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
-            }}
-            title="Share a message"
-          />
+            />
+          )}
         </View>
-      );
-    },
-  },
-
-  {
-    name: 'Bottom Sheet',
-    component: function BottomSheetExample() {
-      const { colorScheme } = useColorScheme();
-      const bottomSheetModalRef = useSheetRef();
-
-      return (
-        <View className="items-center">
-          <DefaultButton
-            color={colorScheme === 'dark' && Platform.OS === 'ios' ? 'white' : 'black'}
-            title="Open Bottom Sheet"
-            onPress={() => bottomSheetModalRef.current?.present()}
-          />
-          <Sheet ref={bottomSheetModalRef} snapPoints={[200]}>
-            <View className="flex-1 items-center justify-center pb-8">
-              <Text>@gorhom/bottom-sheet 🎉</Text>
-            </View>
-          </Sheet>
-        </View>
-      );
-    },
-  },
-
-  {
-    name: 'Avatar',
-    component: function AvatarExample() {
-      const TWITTER_AVATAR_URI =
-        'https://pbs.twimg.com/profile_images/1782428433898708992/1voyv4_A_400x400.jpg';
-      return (
-        <View className="items-center">
-          <Avatar alt="NativeWindUI Avatar">
-            <AvatarImage source={{ uri: TWITTER_AVATAR_URI }} />
-            <AvatarFallback>
-              <Text>NUI</Text>
-            </AvatarFallback>
-          </Avatar>
-        </View>
-      );
-    },
-  },
-];
+      </View>
+    </SafeAreaView>
+  );
+}
