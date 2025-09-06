@@ -28,7 +28,9 @@
       }
     },
     "production": {
-      "buildType": "apk",
+      "android": {
+        "buildType": "apk"
+      },
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_FIREBASE_API_KEY": "$EXPO_PUBLIC_FIREBASE_API_KEY",
