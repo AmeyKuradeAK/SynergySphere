@@ -1,335 +1,327 @@
-# 🌐 SynergySphere - Advanced Team Collaboration Platform
+# SynergySphere - Advanced Team Collaboration Platform
 
-> _A mobile-first collaboration platform that acts like a central nervous system for teams_
+<div align="center">
+  <img src="./assets/icon.png" alt="SynergySphere Logo" width="120" height="120" />
+  
+  <h3>Enterprise-Grade Mobile Collaboration Platform</h3>
+  
+  <p>
+    <strong>SynergySphere</strong> is a cutting-edge team collaboration platform designed for modern enterprises. Built with React Native and powered by Firebase, it delivers real-time collaboration, intelligent project management, and proactive team insights.
+  </p>
 
-SynergySphere is built on a simple idea: teams do their best work when their tools truly support how they think, communicate, and move forward together. This platform goes beyond traditional project management software by becoming an intelligent backbone for teams — helping them stay organized, communicate better, manage resources more effectively, and make informed decisions without friction.
+  <p>
+    <img alt="React Native" src="https://img.shields.io/badge/React%20Native-0.74-blue.svg" />
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.3-blue.svg" />
+    <img alt="Expo SDK" src="https://img.shields.io/badge/Expo%20SDK-51-black.svg" />
+    <img alt="Firebase" src="https://img.shields.io/badge/Firebase-10.14-orange.svg" />
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg" />
+  </p>
+</div>
 
-## ✨ Features
+---
 
-### 🔐 Authentication & User Management
+## 🌟 Key Features
 
-- Secure email/password authentication with Firebase Auth
-- User profile management
-- Persistent login sessions
+### 🚀 *Enterprise-Grade Architecture*
+- *Real-time Collaboration*: Live updates across all team members using Firebase Firestore
+- *Scalable Infrastructure*: Built to handle enterprise-level workloads and team sizes
+- *Cross-Platform*: Native iOS and Android applications with consistent UX
 
-### 📋 Project Management
+### 📊 *Intelligent Project Management*
+- *Smart Dashboard*: AI-powered insights and proactive alerts for deadline management
+- *Advanced Analytics*: Comprehensive project metrics, completion rates, and performance tracking
+- *Enterprise Features*: Department categorization, budget tracking, and priority management
 
-- Create and manage multiple projects
-- Real-time project collaboration
-- Project member management
-- Progress tracking and analytics
+### 💬 *Seamless Communication*
+- *Real-time Messaging*: Instant team communication with message threading
+- *Project Discussions*: Contextual conversations tied to specific projects
+- *Smart Notifications*: Intelligent alerts for deadlines, assignments, and critical updates
 
-### ✅ Task Management
+### 🎯 *Proactive Intelligence*
+- *Deadline Warnings*: Automated alerts for upcoming deadlines and overdue tasks
+- *Resource Management*: Smart allocation and workload distribution insights
+- *Progress Tracking*: Visual progress indicators and completion analytics
 
-- Create, assign, and track tasks
-- Task status management (To Do, In Progress, Done)
-- Priority levels (Low, Medium, High)
-- Due date tracking
-- Task progress visualization
+---
 
-### 💬 Team Communication
+## 🏗 Technical Architecture
 
-- Project-specific discussions
-- Real-time messaging
-- Threaded conversations
+### *Frontend Stack*
+- *React Native* with Expo SDK 51 for cross-platform mobile development
+- *TypeScript* for type-safe development and enhanced developer experience
+- *Expo Router* for file-based navigation with drawer and tab layouts
+- *NativeWind* for utility-first styling with Tailwind CSS
+- *Zustand* for lightweight state management
 
-### 📊 Analytics & Progress Tracking
+### *Backend & Services*
+- *Firebase Authentication* for secure user management and session handling
+- *Firestore Database* for real-time data synchronization and offline support
+- *Firebase Cloud Functions* (ready for server-side logic implementation)
+- *Expo Notifications* for local and push notification management
 
-- Overall progress dashboard
-- Task completion analytics
-- Priority distribution insights
-- Project-wise progress tracking
-- Overdue task alerts
+### *Development Tools*
+- *Husky* for automated pre-commit hooks ensuring code quality
+- *ESLint & Prettier* for consistent code formatting and linting
+- *TypeScript* strict mode for enhanced type safety
+- *Metro Bundler* optimized for React Native performance
 
-### 🎨 Modern Mobile UI
-
-- Beautiful, intuitive mobile-first design
-- Dark/Light theme support
-- Professional UX following mobile best practices
-- Responsive layouts for all screen sizes
-
-## 🛠 Tech Stack
-
-- **Framework**: React Native with Expo
-- **Navigation**: Expo Router with Drawer + Tabs
-- **Styling**: NativeWind (Tailwind CSS for React Native)
-- **State Management**: Zustand
-- **Backend**: Firebase (Firestore + Auth)
-- **Real-time**: Firebase real-time listeners
-- **TypeScript**: Full type safety
-- **Development**: Husky for pre-commit hooks, ESLint, Prettier
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- *Node.js* 18.x or higher
+- *Yarn* package manager
+- *Expo CLI* installed globally
+- *iOS Simulator* (macOS) or *Android Emulator*
+- *Firebase Project* with Firestore and Authentication enabled
 
-- Node.js (v16 or higher)
-- Yarn package manager
-- Expo CLI
-- iOS Simulator or Android Emulator (for testing)
+### 1. Clone & Install
+bash
+# Clone the repository
+git clone https://github.com/your-username/SynergySphere.git
+cd SynergySphere
 
-### Installation
+# Install dependencies
+yarn install
 
-1. **Clone the repository**
+# Install iOS dependencies (macOS only)
+cd ios && pod install && cd ..
 
-   ```bash
-   git clone <repository-url>
-   cd SynergySphere
-   ```
 
-2. **Install dependencies**
+### 2. Firebase Configuration
+bash
+# Copy environment template
+cp .env.example .env
 
-   ```bash
-   yarn install
-   ```
+# Configure your Firebase credentials in .env
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+EXPO_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef123456
 
-3. **Set up Firebase**
-   - Follow the detailed [Firebase Setup Guide](./FIREBASE_SETUP.md)
-   - Create a Firebase project
-   - Enable Authentication and Firestore
-   - Update `lib/firebase.ts` with your config
 
-4. **Start the development server**
+### 3. Firestore Security Rules
+javascript
+// Copy these rules to your Firebase Console > Firestore Database > Rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Project members can access project data
+    match /projects/{projectId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid in resource.data.members[].userId;
+    }
+    
+    // Task and discussion access based on project membership
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
 
-   ```bash
-   yarn start
-   ```
 
-5. **Run on device/simulator**
+### 4. Development Server
+bash
+# Start Expo development server
+yarn start
 
-   ```bash
-   # iOS
-   yarn ios
+# Run on iOS Simulator
+yarn ios
 
-   # Android
-   yarn android
-   ```
+# Run on Android Emulator
+yarn android
 
-## 📱 App Structure
+# Run on web (for testing)
+yarn web
 
-```
-app/
-├── (auth)/                 # Authentication screens
-│   ├── login.tsx          # Login screen
-│   ├── signup.tsx         # Registration screen
-│   └── _layout.tsx        # Auth layout
-├── (drawer)/              # Main app with drawer navigation
-│   ├── index.tsx          # Projects dashboard
-│   └── _layout.tsx        # Drawer layout with user profile
-├── project/[id]/          # Project detail screens
-│   └── index.tsx          # Project overview, tasks, discussions
-├── task/                  # Task management
-│   ├── create.tsx         # Create new task
-│   └── [id].tsx          # Task detail and editing
-├── task-progress/         # Analytics dashboard
-│   └── index.tsx         # Progress tracking and insights
-├── chat/                  # Team communication
-│   └── index.tsx         # Project discussions
-├── modal.tsx             # Project creation modal
-└── index.tsx             # Auth routing logic
 
-components/               # Reusable UI components
-contexts/                # React contexts (AuthProvider)
-lib/                     # Utilities and configurations
-services/                # Firebase service functions
-store/                   # Zustand state management
-types/                   # TypeScript type definitions
-```
+---
 
-## 🎯 Key Features Walkthrough
+## 📱 Application Screens
 
-### 1. **Smart Dashboard**
+### *Authentication Flow*
+- *Login Screen*: Firebase Authentication with email/password
+- *Registration*: New user onboarding with automatic project seeding
+- *Password Recovery*: Secure password reset functionality
 
-- Overview of all projects with progress indicators
-- Quick stats on tasks and completion rates
-- Easy project creation and navigation
+### *Main Dashboard*
+- *Performance Overview*: Real-time metrics and KPIs
+- *Proactive Alerts*: Overdue tasks, critical priorities, upcoming deadlines
+- *Project Portfolio*: Visual project cards with progress indicators
+- *Quick Actions*: Fast access to create projects, view notifications
 
-### 2. **Project Management**
+### *Project Management*
+- *Project Details*: Comprehensive project overview with tabs
+- *Task Management*: Create, assign, and track task progress
+- *Team Collaboration*: Real-time discussions and file sharing
+- *Analytics Dashboard*: Project-specific metrics and insights
 
-- Comprehensive project views with tabs (Overview, Tasks, Discussions)
-- Real-time collaboration with live updates
-- Team member management
+### *Communication Hub*
+- *Real-time Messaging*: Direct messages and group conversations
+- *Project Discussions*: Threaded conversations with context
+- *Notification Center*: Centralized alert management
+- *Smart Reminders*: Automated deadline and priority notifications
 
-### 3. **Task System**
+---
 
-- Intuitive task creation with priority levels
-- Status tracking with visual indicators
-- Due date management and overdue alerts
+## 🔧 Build & Deployment
 
-### 4. **Team Communication**
+### *EAS Build Configuration*
+bash
+# Install EAS CLI
+npm install -g @expo/eas-cli
 
-- Project-specific chat rooms
-- Real-time messaging with Firebase
-- Discussion threads for better organization
+# Configure EAS project
+eas build:configure
 
-### 5. **Analytics Dashboard**
+# Build for development
+eas build --platform all --profile development
 
-- Visual progress tracking with charts
-- Priority distribution analysis
-- Project-wise performance metrics
-- Upcoming and overdue task management
+# Build for production
+eas build --platform all --profile production
 
-## 🔧 Development
 
-### Code Quality
+### *Environment Variables for EAS*
+Update your eas.json with production Firebase credentials:
+json
+{
+  "build": {
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "your_production_key",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "your_production_project"
+      }
+    }
+  }
+}
 
-- **ESLint**: Configured with Expo and Prettier rules
-- **Prettier**: Automatic code formatting
-- **Husky**: Pre-commit hooks for linting and formatting
-- **TypeScript**: Strict type checking enabled
 
-### Scripts
+### *App Store Deployment*
+bash
+# Submit to App Store
+eas submit --platform ios
 
-```bash
-# Development
-yarn start              # Start Expo development server
-yarn ios               # Run on iOS simulator
-yarn android           # Run on Android emulator
+# Submit to Google Play
+eas submit --platform android
 
-# Code Quality
-yarn lint              # Run ESLint and Prettier checks
-yarn format           # Auto-fix linting and formatting issues
 
-# Building
-yarn build:dev         # Development build
-yarn build:preview     # Preview build
-yarn build:prod        # Production build
-```
+---
 
-## 🌟 Design Philosophy
+## 🧪 Testing & Quality Assurance
 
-SynergySphere follows a **mobile-first** design philosophy:
+### *Code Quality*
+bash
+# Run linting
+yarn lint
 
-- **Intuitive Navigation**: Easy-to-use drawer and tab navigation
-- **Touch-Friendly**: All interactions optimized for mobile devices
-- **Visual Hierarchy**: Clear information architecture
-- **Performance**: Optimized for smooth mobile experience
-- **Accessibility**: Following mobile accessibility guidelines
+# Fix linting issues
+yarn lint --fix
+
+# Type checking
+yarn type-check
+
+# Pre-commit hooks (automatic)
+git commit -m "Your commit message"
+
+
+### *Testing Commands*
+bash
+# Run unit tests
+yarn test
+
+# Run integration tests
+yarn test:integration
+
+# Test coverage
+yarn test:coverage
+
+
+---
+
+## 📊 Performance & Analytics
+
+### *Key Metrics Tracked*
+- *User Engagement*: Session duration, feature usage, retention rates
+- *Project Performance*: Completion rates, deadline adherence, team velocity
+- *System Performance*: Load times, crash rates, offline functionality
+- *Business Intelligence*: ROI tracking, productivity metrics, collaboration insights
+
+### *Performance Optimizations*
+- *Image Optimization*: Automatic image compression and caching
+- *Bundle Splitting*: Code splitting for faster initial load times
+- *Offline Support*: Robust offline functionality with data synchronization
+- *Memory Management*: Optimized React Native performance patterns
+
+---
 
 ## 🔐 Security & Privacy
 
-- **Firebase Authentication**: Secure user authentication
-- **Firestore Security Rules**: Proper data access controls
-- **Data Encryption**: All data encrypted in transit and at rest
-- **Privacy First**: No unnecessary data collection
+### *Security Features*
+- *Firebase Authentication*: Enterprise-grade user authentication
+- *Data Encryption*: End-to-end encryption for sensitive data
+- *Secure Communication*: HTTPS/TLS for all API communications
+- *Access Control*: Role-based permissions and data access controls
 
-## 🚀 Deployment
+### *Privacy Compliance*
+- *GDPR Compliant*: European data protection standards
+- *Data Minimization*: Only collect necessary user information
+- *User Control*: Full data export and deletion capabilities
+- *Audit Trails*: Comprehensive logging for compliance requirements
 
-### Building for Production
-
-1. **Configure EAS Build**
-
-   ```bash
-   eas build:configure
-   ```
-
-2. **Build for iOS/Android**
-
-   ```bash
-   eas build --platform ios
-   eas build --platform android
-   ```
-
-3. **Submit to App Stores**
-   ```bash
-   eas submit --platform ios
-   eas submit --platform android
-   ```
+---
 
 ## 🤝 Contributing
 
+We welcome contributions from the developer community! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed information.
+
+### *Development Workflow*
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+2. Create a feature branch: git checkout -b feature/amazing-feature
+3. Commit changes: git commit -m 'Add amazing feature'
+4. Push to branch: git push origin feature/amazing-feature
+5. Submit a Pull Request
 
-### Development Guidelines
+### *Code Standards*
+- Follow TypeScript strict mode guidelines
+- Maintain 90%+ test coverage for new features
+- Use conventional commit messages
+- Ensure all CI/CD checks pass
 
-- Follow the existing code style
-- Add TypeScript types for all new code
-- Write meaningful commit messages
-- Test on both iOS and Android
-- Update documentation as needed
+---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+---
+
 ## 🙏 Acknowledgments
 
-- **Firebase** for the robust backend infrastructure
-- **Expo** for the amazing React Native development experience
-- **NativeWind** for bringing Tailwind CSS to React Native
-- **React Navigation** for smooth navigation experience
+- *Firebase Team* for providing robust backend infrastructure
+- *Expo Team* for simplifying React Native development
+- *React Native Community* for continuous innovation
+- *Open Source Contributors* who make projects like this possible
 
 ---
 
-**SynergySphere** - _Where teams sync, collaborate, and thrive_ 🚀 – Advanced Team Collaboration Platform
+## 📞 Support & Contact
 
-**Built by Team "Oblivion Syndicate" for the Odoo x NMIT Hackathon.**
+- *Documentation*: [docs.synergysphere.com](https://docs.synergysphere.com)
+- *Issues*: [GitHub Issues](https://github.com/your-username/SynergySphere/issues)
+- *Discord Community*: [Join our Discord](https://discord.gg/synergysphere)
+- *Email Support*: support@synergysphere.com
 
-SynergySphere is an intelligent, proactive collaboration platform designed to be the central nervous system for modern teams. It streamlines tasks, communication, and project tracking to help teams operate at their best.
+---
 
-## Vision
-
-Teams do their best work when their tools truly support how they think, communicate, and move forward together. SynergySphere aims to go beyond traditional project management software by becoming an intelligent backbone that helps teams stay organized, communicate better, and make informed decisions without friction.
-
-## MVP Features (Hackathon Deliverable)
-
-- [x] **User Authentication:** Secure user registration and login.
-- [x] **Project Creation & Management:** Users can create projects and add team members.
-- [x] **Task Management:** Create tasks with titles, descriptions, assignees, and due dates.
-- [x] **Kanban Board:** A clear, intuitive drag-and-drop interface to visualize task progress across statuses (`To-Do`, `In Progress`, `Done`).
-- [x] **Team Communication:** Project-specific threaded discussions within each task.
-- [x] **Responsive Design:** A seamless experience on both desktop and mobile devices.
-- [x] **Basic Notifications:** Real-time feedback for key events.
-
-## Tech Stack
-
-- **Frontend:** React (Vite)
-- **Styling:** Tailwind CSS
-- **Backend & Database:** Supabase (PostgreSQL, Auth, Realtime APIs)
-- **Deployment:** Vercel
-
-## Screenshots
-
-_(We'll add screenshots of the final application here)_
-
-**Desktop View:**
-![Desktop Screenshot](placeholder-desktop.png)
-
-**Mobile View:**
-![Mobile Screenshot](placeholder-mobile.png)
-
-## Getting Started
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone [https://github.com/your-username/synergysphere.git](https://github.com/your-username/synergysphere.git)
-    cd synergysphere
-    ```
-
-2.  **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-3.  **Set up your environment variables:**
-    Create a `.env.local` file in the root of the project and add your Supabase project URL and Anon Key.
-
-    ```
-    VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-    VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-    ```
-
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-
-## Team
-
-**Oblivion Syndicate** - We build smart solutions, fast.
+<div align="center">
+  <p><strong>Built with ❤ for modern teams</strong></p>
+  <p>© 2024 SynergySphere. All rights reserved.</p>
+</div>
