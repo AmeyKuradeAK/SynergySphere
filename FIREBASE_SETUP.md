@@ -36,21 +36,26 @@
 4. Click "Register app"
 5. Copy the Firebase configuration object
 
-## Step 5: Update Firebase Configuration
+## Step 5: Configure Environment Variables
 
-1. Open `lib/firebase.ts` in your project
-2. Replace the placeholder configuration with your actual Firebase config:
+1. Copy the `.env.example` file to create a new `.env` file:
 
-```typescript
-const firebaseConfig = {
-  apiKey: 'your-actual-api-key',
-  authDomain: 'your-project-id.firebaseapp.com',
-  projectId: 'your-actual-project-id',
-  storageBucket: 'your-project-id.appspot.com',
-  messagingSenderId: 'your-actual-sender-id',
-  appId: 'your-actual-app-id',
-};
-```
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Open the `.env` file and replace the placeholder values with your actual Firebase config:
+
+   ```
+   EXPO_PUBLIC_FIREBASE_API_KEY=your-actual-api-key
+   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+   EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-actual-project-id
+   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-actual-sender-id
+   EXPO_PUBLIC_FIREBASE_APP_ID=your-actual-app-id
+   ```
+
+3. **Important**: The `.env` file is already added to `.gitignore` to keep your credentials secure. Never commit your actual Firebase credentials to version control!
 
 ## Step 6: Configure Firestore Security Rules
 
