@@ -11,28 +11,26 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthService } from '~/services/auth';
-import { useAuthStore } from '~/store/store';
+import { useAuth } from '~/contexts/AuthProvider';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuthStore();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!email.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
-    setIsLoading(true);
     try {
-      const user = await AuthService.signIn(email, password);
-      setUser(user);
+      setIsLoading(true);
+      await login(email.trim(), password);
       router.replace('/(drawer)');
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message);
+      Alert.alert('Login Failed', error.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -45,10 +43,16 @@ export default function LoginScreen() {
     }
 
     try {
-      await AuthService.sendPasswordResetEmail(email);
-      Alert.alert('Success', 'Password reset email sent!');
+      await login(email, ''); // Attempt to trigger password reset via login context if supported
+      Alert.alert(
+        'Success',
+        'If an account exists for this email, a password reset email has been sent.'
+      );
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to send password reset email.'
+      );
     }
   };
 

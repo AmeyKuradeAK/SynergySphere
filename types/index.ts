@@ -17,10 +17,21 @@ export interface Project {
   updatedAt: Date;
   color?: string;
   isArchived: boolean;
+  // Enterprise features
+  imageUrl?: string;
+  tags: string[];
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  department?: string;
+  budget?: number;
+  deadline?: Date;
+  status: 'planning' | 'active' | 'on-hold' | 'completed' | 'cancelled';
+  progress: number; // 0-100
 }
 
 export interface ProjectMember {
   userId: string;
+  email: string;
+  name: string;
   role: 'owner' | 'admin' | 'member';
   joinedAt: Date;
 }
@@ -31,17 +42,38 @@ export interface Task {
   description: string;
   projectId: string;
   assigneeId?: string;
+  assigneeName?: string;
+  assigneeEmail?: string;
   creatorId: string;
+  creatorName?: string;
   status: TaskStatus;
   priority: TaskPriority;
   dueDate?: Date;
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
+  // Enterprise features
+  estimatedHours?: number;
+  actualHours?: number;
+  blockers?: string[];
+  dependencies?: string[]; // Task IDs this task depends on
+  attachments?: string[];
+  comments?: TaskComment[];
+  tags?: string[];
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
-export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Discussion {
   id: string;
@@ -49,9 +81,12 @@ export interface Discussion {
   title: string;
   content: string;
   authorId: string;
+  authorName?: string;
   createdAt: Date;
   updatedAt: Date;
   replies: Reply[];
+  tags?: string[];
+  isPinned?: boolean;
 }
 
 export interface Reply {
@@ -99,4 +134,37 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+}
+
+// Chat types
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  senderId: string;
+  senderName: string;
+  senderEmail: string;
+  content: string;
+  type: 'text' | 'image' | 'file';
+  readBy: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Chat {
+  id: string;
+  participants: ChatParticipant[];
+  lastMessage?: ChatMessage;
+  lastMessageAt: Date;
+  isGroup: boolean;
+  name?: string; // For group chats
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatParticipant {
+  userId: string;
+  email: string;
+  name: string;
+  joinedAt: Date;
+  isActive: boolean;
 }

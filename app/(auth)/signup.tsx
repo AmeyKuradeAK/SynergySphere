@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthService } from '~/services/auth';
-import { useAuthStore } from '~/store/store';
+import { useAuth } from '~/contexts/AuthProvider';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
@@ -20,10 +19,15 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuthStore();
+  const { signup } = useAuth();
 
   const handleSignup = async () => {
-    if (!name || !email || !password || !confirmPassword) {
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim()
+    ) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -38,13 +42,12 @@ export default function SignupScreen() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const user = await AuthService.signUp(email, password, name);
-      setUser(user);
+      setIsLoading(true);
+      await signup(name.trim(), email.trim(), password);
       router.replace('/(drawer)');
     } catch (error: any) {
-      Alert.alert('Signup Failed', error.message);
+      Alert.alert('Signup Failed', error.message || 'Failed to create account');
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+// Minimal Firebase setup - no auth initialization to avoid conflicts
+import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 // Firebase config from environment variables
@@ -12,21 +12,13 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase app
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Initialize Auth
-const auth = getAuth(app);
-
-// Initialize Firestore
+// Initialize Firestore only
 const db = getFirestore(app);
 
-// Connect to emulator in development (optional)
-if (__DEV__) {
-  // Uncomment these lines if you want to use Firebase emulator
-  // connectFirestoreEmulator(db, 'localhost', 8080);
-  // connectAuthEmulator(auth, 'http://localhost:9099');
-}
-
-export { auth, db };
+// Export only what we need
+export { db };
 export default app;
